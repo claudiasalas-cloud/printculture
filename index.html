@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CulturePrint &mdash; your AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #faf8f4;
+  --warm: #f3ead8;
+  --warm-mid: #e4d4b8;
+  --warm-dark: #c8b090;
+  --ink: #051922;
+  --ink-mid: #051922;
+  --ink-light: #1a3a4a;
+  --ink-faint: #2d5060;
+  --sage: #4a7c50;
+  --sage-light: #dce9de;
+  --sage-mid: #88b48c;
+  --terra: #a85c2c;
+  --terra-light: #f0e4d8;
+  --gold: #b88a28;
+  --gold-light: #f8f0d8;
+  --red: #a43830;
+  --red-light: #f2e4e2;
+  --green: #386040;
+  --green-light: #daeadc;
+  --r: 10px; --rl: 16px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+button, input, textarea, select { font-family: 'Poppins', sans-serif; }
+body { background: var(--cream); color: var(--ink); font-family: 'Poppins', sans-serif; font-weight: 400; min-height: 100vh; }
+
+.pbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: var(--warm-mid); z-index: 200; }
+.pfill { height: 100%; background: linear-gradient(90deg, var(--sage) 0%, var(--gold) 100%); transition: width .8s cubic-bezier(.4,0,.2,1); }
+
+.brand { position: fixed; top: 0; left: 0; right: 0; padding: 13px 40px; display: flex; align-items: center; justify-content: space-between; background: rgba(250,248,244,.96); backdrop-filter: blur(12px); z-index: 100; border-bottom: 1px solid var(--warm-mid); }
+.bname { font-size: 1.05rem; font-weight: 600; letter-spacing: -.02em; color: var(--ink); }
+.bname span { color: var(--sage); }
+.btag { font-size: .6rem; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
+.bod { font-size: .65rem; color: var(--ink-faint); }
+
+.mod { display: none; min-height: 100vh; padding: 88px 40px 64px; max-width: 720px; margin: 0 auto; animation: fu .4s ease both; }
+.mod.on { display: block; }
+@keyframes fu { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+.eye { font-size: .6rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 10px; }
+h1 { font-family: 'Poppins', sans-serif; font-size: clamp(2rem,5vw,3.1rem); font-weight: 400; line-height: 1.08; margin-bottom: 10px; }
+h1 em { color: var(--sage); font-style: italic; }
+h2 { font-family: 'Poppins', sans-serif; font-size: clamp(1.5rem,3vw,1.95rem); font-weight: 400; line-height: 1.2; margin-bottom: 10px; }
+h3 { font-size: .9rem; font-weight: 600; margin-bottom: 5px; }
+p { font-size: .875rem; line-height: 1.78; color: var(--ink-mid); margin-bottom: 12px; }
+p strong { color: var(--ink); font-weight: 500; }
+
+.card { background: var(--warm); border: 1px solid var(--warm-mid); border-radius: var(--rl); padding: 22px 26px; margin-bottom: 14px; }
+.quote { background: var(--gold-light); border-left: 3px solid var(--gold); border-radius: 0 var(--r) var(--r) 0; padding: 14px 20px; margin: 18px 0; font-family: 'Poppins', sans-serif; font-size: 1.08rem; font-style: italic; line-height: 1.65; color: var(--ink); }
+.divl { width: 32px; height: 2px; background: var(--warm-dark); margin: 16px 0; }
+
+.btn { display: inline-flex; align-items: center; gap: 7px; border: none; border-radius: 8px; padding: 11px 22px; font-family: 'Poppins', sans-serif; font-size: .82rem; font-weight: 500; cursor: pointer; transition: all .2s; }
+.bp { background: var(--ink); color: var(--cream); }
+.bp:hover { background: var(--sage); transform: translateY(-1px); }
+.bp:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+.bs { background: transparent; color: var(--ink-mid); border: 1px solid var(--warm-dark); }
+.bs:hover { border-color: var(--sage); color: var(--sage); }
+.brow { display: flex; gap: 9px; margin-top: 22px; flex-wrap: wrap; align-items: center; }
+
+.fld { margin-bottom: 16px; }
+label { display: block; font-size: .67rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 5px; }
+input[type=text], textarea, select { width: 100%; background: white; border: 1.5px solid var(--warm-mid); border-radius: 8px; padding: 9px 13px; font-family: 'Poppins', sans-serif; font-size: .85rem; font-weight: 400; color: var(--ink); transition: border-color .2s; outline: none; }
+input[type=text]:focus, textarea:focus, select:focus { border-color: var(--sage); }
+textarea { resize: vertical; min-height: 78px; line-height: 1.65; }
+
+.ctop { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1px solid var(--warm-mid); }
+.cpill { background: var(--warm); border: 1px solid var(--warm-mid); border-radius: 20px; padding: 3px 11px; font-size: .7rem; font-weight: 500; color: var(--ink-mid); }
+
+.dchips { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 18px; }
+.dchip { font-size: .6rem; font-weight: 500; padding: 3px 9px; border-radius: 10px; background: var(--warm); border: 1px solid var(--warm-mid); color: var(--ink-faint); transition: all .2s; }
+.dchip.done { background: var(--sage-light); border-color: var(--sage-mid); color: var(--sage); }
+.dchip.cur { background: var(--terra-light); border-color: rgba(168,92,44,.28); color: var(--terra); }
+
+.dhead { background: linear-gradient(135deg, var(--sage-light) 0%, var(--warm) 100%); border: 1px solid rgba(74,124,80,.16); border-radius: var(--rl); padding: 18px 22px; margin-bottom: 20px; }
+.dhead .eye { color: var(--sage); margin-bottom: 5px; }
+.dhead h2 { font-size: 1.4rem; margin-bottom: 3px; }
+.dhead p { font-size: .8rem; margin: 0; color: var(--ink-mid); }
+
+.scard { background: white; border: 1.5px solid var(--warm-mid); border-radius: var(--rl); margin-bottom: 16px; overflow: hidden; transition: border-color .2s; }
+.scard.ans { border-color: var(--sage-mid); }
+.shead { background: var(--warm); padding: 12px 16px; border-bottom: 1px solid var(--warm-mid); display: flex; align-items: flex-start; gap: 10px; }
+.snum { width: 22px; height: 22px; border-radius: 50%; background: var(--warm-dark); color: var(--ink-faint); font-size: .62rem; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; transition: all .2s; }
+.scard.ans .snum { background: var(--sage); color: white; }
+.sscen { font-size: .86rem; font-weight: 600; color: var(--ink); line-height: 1.5; }
+.sbody { padding: 14px 16px; }
+.squestion { font-size: .76rem; font-weight: 600; color: var(--ink); margin-bottom: 11px; }
+
+.bopts { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+.bopt { display: flex; align-items: flex-start; gap: 8px; background: var(--cream); border: 1.5px solid var(--warm-mid); border-radius: 8px; padding: 9px 12px; cursor: pointer; transition: all .15s; text-align: left; width: 100%; font-family: 'Poppins', sans-serif; }
+.bopt:hover { border-color: var(--sage-mid); background: var(--sage-light); }
+.bopt.sel { border-color: var(--sage); background: var(--sage-light); }
+.brad { width: 15px; height: 15px; border-radius: 50%; border: 1.5px solid var(--warm-dark); flex-shrink: 0; margin-top: 2px; transition: all .15s; display: flex; align-items: center; justify-content: center; }
+.bopt.sel .brad { background: var(--sage); border-color: var(--sage); }
+.brad::after { content: ''; width: 5px; height: 5px; border-radius: 50%; background: white; opacity: 0; transition: opacity .15s; }
+.bopt.sel .brad::after { opacity: 1; }
+.btxt { font-size: .82rem; font-weight: 400; color: var(--ink); line-height: 1.5; }
+.bopt.sel .btxt { color: var(--ink); font-weight: 400; }
+
+.or-div { font-size: .62rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); text-align: center; margin: 6px 0 5px; }
+
+.vmsg { display: none; border-radius: 7px; padding: 8px 12px; margin-top: 5px; font-size: .78rem; line-height: 1.55; }
+.vmsg.on { display: block; }
+.vmsg.err { background: var(--red-light); border: 1px solid rgba(164,56,48,.2); color: var(--red); }
+.vmsg.ok { background: var(--sage-light); border: 1px solid rgba(74,124,80,.2); color: var(--sage); }
+
+.flags-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+.flag-card { border-radius: var(--r); padding: 14px 16px; }
+.flag-card.gf { background: var(--green-light); border: 1.5px solid rgba(56,96,64,.18); }
+.flag-card.rf { background: var(--red-light); border: 1.5px solid rgba(164,56,48,.18); }
+.flag-ttl { font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+.flag-card.gf .flag-ttl { color: var(--green); }
+.flag-card.rf .flag-ttl { color: var(--red); }
+.flag-hint { font-size: .7rem; color: var(--ink-light); margin-bottom: 5px; line-height: 1.55; }
+.flag-ex { font-size: .66rem; color: var(--ink-faint); margin-bottom: 7px; line-height: 1.6; font-style: italic; }
+.flag-vld { display: none; font-size: .74rem; border-radius: 6px; padding: 6px 10px; margin-top: 5px; }
+.flag-vld.on { display: block; }
+.flag-vld.err { background: var(--red-light); color: var(--red); }
+.flag-vld.ok { background: var(--sage-light); color: var(--sage); }
+.flag-card.gf textarea { border-color: rgba(56,96,64,.2); }
+.flag-card.gf textarea:focus { border-color: var(--green); }
+.flag-card.rf textarea { border-color: rgba(164,56,48,.2); }
+.flag-card.rf textarea:focus { border-color: var(--red); }
+
+.sctr { font-size: .7rem; color: var(--ink-faint); margin-bottom: 14px; }
+.sctr b { color: var(--sage); }
+
+/* MINDSET MODULE */
+.mindset-tabs { display: flex; gap: 0; border: 1.5px solid var(--warm-mid); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+.mtab { flex: 1; padding: 12px; background: var(--warm); border: none; font-family: 'Poppins', sans-serif; font-size: .8rem; font-weight: 400; color: var(--ink-light); cursor: pointer; transition: all .2s; border-right: 1px solid var(--warm-mid); }
+.mtab:last-child { border-right: none; }
+.mtab.on { background: var(--ink); color: var(--cream); font-weight: 500; }
+.mtab-panel { display: none; }
+.mtab-panel.on { display: block; }
+.paste-hint { background: var(--gold-light); border: 1px solid rgba(184,138,40,.2); border-radius: var(--r); padding: 12px 16px; font-size: .8rem; color: var(--ink-mid); line-height: 1.65; margin-bottom: 14px; }
+.paste-hint strong { color: var(--gold); font-weight: 600; }
+
+/* PROMPTS */
+.ptabs { display: flex; border-bottom: 1px solid var(--warm-mid); }
+.ptab { padding: 9px 16px; background: transparent; border: none; font-family: 'Poppins', sans-serif; font-size: .75rem; font-weight: 500; color: var(--ink-faint); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .2s; }
+.ptab.on { color: var(--sage); border-bottom-color: var(--sage); }
+.ppanel { display: none; padding: 18px 0; }
+.ppanel.on { display: block; }
+.wpaste { background: var(--sage-light); border-radius: var(--r); padding: 11px 15px; margin-bottom: 12px; font-size: .76rem; color: var(--ink-mid); line-height: 1.65; }
+.wpaste strong { display: block; font-size: .62rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--sage); margin-bottom: 4px; }
+.pbox { background: var(--cream); border: 1.5px solid var(--warm-mid); border-radius: var(--r); padding: 18px; font-family: 'Poppins', sans-serif; font-size: .78rem; font-weight: 400; line-height: 1.88; color: var(--ink); white-space: pre-wrap; max-height: 440px; overflow-y: auto; margin-bottom: 12px; }
+.prompt-note { background: var(--gold-light); border: 1px solid rgba(184,138,40,.2); border-radius: var(--r); padding: 14px 16px; font-size: .78rem; color: var(--ink-mid); line-height: 1.7; margin-top: 14px; }
+.prompt-note strong { color: var(--gold); font-weight: 600; }
+.cbtn { display: inline-flex; align-items: center; gap: 6px; background: var(--warm); border: 1px solid var(--warm-dark); border-radius: 7px; padding: 6px 13px; font-family: 'Poppins', sans-serif; font-size: .72rem; font-weight: 500; cursor: pointer; transition: all .2s; color: var(--ink-mid); }
+.cbtn:hover, .cbtn.done { background: var(--sage); color: white; border-color: var(--sage); }
+
+.icard { border-radius: var(--rl); padding: 18px 22px; margin-bottom: 12px; }
+.icard.amp { background: var(--terra-light); border: 1px solid rgba(168,92,44,.16); }
+.icard.conv { background: var(--gold-light); border: 1px solid rgba(184,138,40,.16); }
+.icard.act { background: var(--sage-light); border: 1px solid rgba(74,124,80,.16); }
+.ilbl { font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 5px; }
+.icard.amp .ilbl { color: var(--terra); }
+.icard.conv .ilbl { color: var(--gold); }
+.icard.act .ilbl { color: var(--sage); }
+.itxt { font-size: .85rem; color: var(--ink); line-height: 1.72; }
+.isub { font-size: .76rem; color: var(--ink-light); font-style: italic; margin-top: 5px; }
+
+.ld { display: none; padding: 32px 0; text-align: center; }
+.ld.on { display: block; }
+.ldots { display: inline-flex; gap: 5px; margin-bottom: 12px; }
+.ldots span { width: 7px; height: 7px; border-radius: 50%; background: var(--sage); animation: bo 1.2s ease-in-out infinite; }
+.ldots span:nth-child(2) { animation-delay: .2s; }
+.ldots span:nth-child(3) { animation-delay: .4s; }
+@keyframes bo { 0%,60%,100% { transform: translateY(0); opacity: .35; } 30% { transform: translateY(-7px); opacity: 1; } }
+.ltxt { font-family: 'Poppins', sans-serif; font-size: .98rem; font-style: italic; color: var(--ink-faint); }
+
+.foot { text-align: center; padding: 28px 0 10px; border-top: 1px solid var(--warm-mid); margin-top: 28px; }
+.foot p { font-size: .68rem; color: var(--ink-faint); margin: 0; }
+.foot a { color: var(--sage); text-decoration: none; }
+
+@media (max-width:600px) {
+  .mod { padding: 78px 16px 36px; }
+  .brand { padding: 11px 16px; }
+  .bod { display: none; }
+  h1 { font-size: 1.85rem; }
+  .flags-wrap { grid-template-columns: 1fr; }
+  .mindset-tabs { flex-direction: column; }
+  .mtab { border-right: none; border-bottom: 1px solid var(--warm-mid); }
+  .mtab:last-child { border-bottom: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="pbar"><div class="pfill" id="pf" style="width:5%"></div></div>
+
+<div class="brand">
+  <div class="bname">Culture<span>Print</span></div>
+  <div class="btag">your AI</div>
+  <div class="bod">Organizaciones Despiertas</div>
+</div>
+
+<!-- M1 BIENVENIDA -->
+<div class="mod on" id="m1">
+  <div class="eye">Organizaciones Despiertas &middot; CulturePrint</div>
+  <h1>Entr&eacute;nale a tu IA<br>la cultura que<br>quieres <em>construir</em></h1>
+  <div class="quote">&ldquo;La IA no inventa cultura. La amplifica. D&eacute;finele la cultura ideal y la reforzar&aacute; a escala en cada conversaci&oacute;n.&rdquo;</div>
+  <p>CulturePrint convierte tus decisiones culturales en instrucciones concretas para tu IA. No lo que existe hoy &mdash; lo que quieres construir.</p>
+  <p>En unos 20 minutos tendr&aacute;s instrucciones situacionales concretas que tu IA usar&aacute; como br&uacute;jula cultural en cada interacci&oacute;n con tu equipo.</p>
+  <p style="font-style:italic;color:var(--ink-faint);font-size:.82rem;">&iquest;C&oacute;mo quieres que responda tu IA cuando alguien le traiga un conflicto, un error que nadie quiere nombrar, o una decisi&oacute;n que nadie quiere tomar?</p>
+  <div class="divl"></div>
+  <div class="card">
+    <h3>Cu&eacute;ntame sobre tu organizaci&oacute;n</h3>
+    <div class="fld"><label>Tu nombre</label><input type="text" id="uN" placeholder="Nombre"></div>
+    <div class="fld"><label>Organizaci&oacute;n</label><input type="text" id="uC" placeholder="Empresa o equipo"></div>
+    <div class="fld">
+      <label>Tu rol</label>
+      <select id="uR">
+        <option value="">Selecciona...</option>
+        <option>HR Director / Chief People Officer</option>
+        <option>Culture Lead / People &amp; Culture</option>
+        <option>CEO / Director General</option>
+        <option>Responsable de Transformaci&oacute;n</option>
+        <option>Manager / L&iacute;der de equipo</option>
+        <option>Otro</option>
+      </select>
+    </div>
+    <div class="fld">
+      <label>Tama&ntilde;o del equipo</label>
+      <select id="uS">
+        <option value="">Selecciona...</option>
+        <option value="menos de 50 personas">Menos de 50 personas</option>
+        <option value="50-200 personas">50 &ndash; 200 personas</option>
+        <option value="200-1000 personas">200 &ndash; 1.000 personas</option>
+        <option value="más de 1.000 personas">M&aacute;s de 1.000 personas</option>
+      </select>
+    </div>
+    <div class="fld" style="margin-bottom:0"><label>Industria (opcional)</label><input type="text" id="uI" placeholder="Ej. Farmac&eacute;utica, Tecnolog&iacute;a, Retail..."></div>
+  </div>
+  <div class="brow"><button class="btn bp" onclick="go2()">Definir la cultura ideal &rarr;</button></div>
+  <div class="foot"><p>Un producto de Organizaciones Despiertas &middot; Claudia Salas Bozich &middot; Metodolog&iacute;a SER+HACER</p></div>
+</div>
+
+<!-- M2 DIMENSIONES -->
+<div class="mod" id="m2">
+  <div class="ctop">
+    <div class="eye" style="margin:0">Cultura ideal &mdash; dimensiones</div>
+    <div class="cpill" id="cp2"></div>
+  </div>
+  <div id="m2c"></div>
+</div>
+
+<!-- M3 MINDSET -->
+<div class="mod" id="m3">
+  <div class="ctop">
+    <div class="eye" style="margin:0">SER &mdash; Mindset y valores</div>
+    <div class="cpill" id="cp3"></div>
+  </div>
+  <h2>La capa profunda: qui&eacute;nes quieren ser</h2>
+  <p>Los comportamientos definen el HACER. Ahora la capa SER: el mindset, las actitudes y los valores que explican <em>por qu&eacute;</em> se elige un comportamiento sobre otro. Esto le dar&aacute; a tu IA criterios para navegar situaciones que nadie defini&oacute; expl&iacute;citamente.</p>
+  <div class="mindset-tabs">
+    <button class="mtab on" onclick="switchMTab(0)">Tenemos algo escrito</button>
+    <button class="mtab" onclick="switchMTab(1)">Lo pensamos ahora</button>
+  </div>
+  <div class="mtab-panel on" id="mtp0">
+    <div class="paste-hint"><strong>Pega o sube lo que tengan</strong>Manual de cultura, valores con definiciones, c&oacute;digo de conducta, perfil del empleado ideal, descripci&oacute;n de cultura en job descriptions &mdash; lo que sea. Claude extraer&aacute; lo relevante.</div>
+    <div class="fld"><label>Pega el texto aqu&iacute;</label><textarea id="msExisting" rows="7" placeholder="Pega aqu&iacute; cualquier documento de cultura que tengan. No tiene que estar perfecto."></textarea></div>
+  </div>
+  <div class="mtab-panel" id="mtp1">
+    <div class="fld">
+      <label>El empleado ideal</label>
+      <p style="font-size:.8rem;color:var(--ink-light);margin-bottom:8px;">No el perfil del CV. La persona que, cuando entra a una reuni&oacute;n, eleva el nivel de todos. &iquest;C&oacute;mo piensa, c&oacute;mo act&uacute;a, qu&eacute; actitudes tiene?</p>
+      <textarea id="msIdeal" rows="5" placeholder="Ej: Llega con criterio propio y escucha con curiosidad. Nombra lo que ve aunque sea inc&oacute;modo. Construye sobre lo que dice el otro en lugar de defender su posici&oacute;n..."></textarea>
+    </div>
+    <div class="fld">
+      <label>Algo m&aacute;s que no qued&oacute; en las dimensiones (opcional)</label>
+      <textarea id="msExtra" rows="3" placeholder="Cualquier creencia, actitud o valor que sea importante para tu cultura y no apareci&oacute; antes..."></textarea>
+    </div>
+  </div>
+  <div class="brow">
+    <button class="btn bp" onclick="go4()">Generar mi CulturePrint &rarr;</button>
+    <button class="btn bs" onclick="go4skip()">Saltar este paso &rarr;</button>
+  </div>
+</div>
+
+<!-- M4 PROMPTS -->
+<div class="mod" id="m4">
+  <div class="ctop">
+    <div class="eye" style="margin:0">Tu CulturePrint</div>
+    <div class="cpill" id="cp4"></div>
+  </div>
+  <h2>Tu system prompt est&aacute; listo</h2>
+  <p>Instrucciones situacionales concretas, una por dimensi&oacute;n. El mismo contenido para cualquier plataforma &mdash; solo cambia d&oacute;nde pegarlo.</p>
+  <div class="ld" id="pld"><div class="ldots"><span></span><span></span><span></span></div><p class="ltxt">Generando tus instrucciones culturales...</p></div>
+  <div id="pc" style="display:none">
+    <div class="ptabs">
+      <button class="ptab on" onclick="spt('claude',0)">Claude</button>
+      <button class="ptab" onclick="spt('chatgpt',1)">ChatGPT</button>
+      <button class="ptab" onclick="spt('copilot',2)">Copilot</button>
+    </div>
+    <div class="ppanel on" id="pp_claude">
+      <div class="wpaste"><strong>D&oacute;nde pegarlo</strong>Claude.ai &rarr; abre o crea un Proyecto &rarr; Configuraci&oacute;n &rarr; &ldquo;Project Instructions&rdquo;. Pega el texto completo.</div>
+      <div class="pbox" id="pt_claude"></div>
+      <button class="cbtn" id="cb_claude" onclick="cp('claude')">&#128203; Copiar</button>
+    </div>
+    <div class="ppanel" id="pp_chatgpt">
+      <div class="wpaste"><strong>D&oacute;nde pegarlo</strong>ChatGPT &rarr; Configuraci&oacute;n &rarr; &ldquo;Custom Instructions&rdquo; &rarr; campo inferior. O en GPT Builder &rarr; &ldquo;Instructions&rdquo;.</div>
+      <div class="pbox" id="pt_chatgpt"></div>
+      <button class="cbtn" id="cb_chatgpt" onclick="cp('chatgpt')">&#128203; Copiar</button>
+    </div>
+    <div class="ppanel" id="pp_copilot">
+      <div class="wpaste"><strong>D&oacute;nde pegarlo</strong>Copilot Studio &rarr; Tu agente &rarr; Configure &rarr; &ldquo;Instructions&rdquo;. En Microsoft 365: System Message de tu agente.</div>
+      <div class="pbox" id="pt_copilot"></div>
+      <button class="cbtn" id="cb_copilot" onclick="cp('copilot')">&#128203; Copiar</button>
+    </div>
+    <div class="prompt-note">
+      <strong>Este prompt es un punto de partida, no el final.</strong> Revísalo, ajústalo, y añade lo que consideres. Si tu organización tiene valores formales con definiciones propias, pégalos al final del prompt con su descripción exacta &mdash; la IA los usará como criterio adicional.
+    </div>
+    <div class="brow" style="margin-top:20px"><button class="btn bp" onclick="go5()">Ver insights y próximos pasos &rarr;</button></div>
+  </div>
+</div>
+
+<!-- M5 INSIGHTS -->
+<div class="mod" id="m5">
+  <div class="ctop">
+    <div class="eye" style="margin:0">Hoja de ruta</div>
+    <div class="cpill" id="cp5"></div>
+  </div>
+  <h2>Pr&oacute;ximos pasos</h2>
+  <div class="ld" id="ild"><div class="ldots"><span></span><span></span><span></span></div><p class="ltxt">Construyendo tu hoja de ruta...</p></div>
+  <div id="ic" style="display:none"></div>
+</div>
+
+<script>
+var S = {
+  user: {},
+  answers: {},
+  custom: {},
+  greenFlags: {},
+  redFlags: {},
+  mindset: '',
+  prompt: ''
+};
+
+var DIMS = [
+  {
+    id: 'poder', label: 'Poder y jerarqu\u00eda',
+    intro: 'Define c\u00f3mo quieres que funcione la autoridad en tu organizaci\u00f3n. Qui\u00e9n puede disentir, c\u00f3mo se relaciona el rango con el conocimiento.',
+    sits: [
+      {
+        s: 'Un manager toma una decisi\u00f3n que su equipo considera equivocada.',
+        q: '\u00bfC\u00f3mo quieres que act\u00fae el equipo?',
+        o: [
+          'El equipo lo dice en el momento, con argumentos, antes de que se ejecute',
+          'Se ejecuta; quien discrepa lo habla en privado con el manager despu\u00e9s',
+          'Se ejecuta y se documenta la discrepancia para revisarla en retrospectiva',
+          'Se pide una conversaci\u00f3n breve para alinear criterios antes de ejecutar'
+        ]
+      },
+      {
+        s: 'Alguien con menos rango tiene m\u00e1s expertise en un tema que su manager.',
+        q: '\u00bfC\u00f3mo quieres que se gestione ese conocimiento?',
+        o: [
+          'Su criterio lidera la decisi\u00f3n en ese tema, independientemente del rango',
+          'Presenta su recomendaci\u00f3n con argumentos; el manager decide con esa base',
+          'Facilitan una conversaci\u00f3n donde ambos exponen perspectiva antes de decidir',
+          'El manager decide pero solicita expl\u00edcitamente su validaci\u00f3n t\u00e9cnica antes'
+        ]
+      }
+    ],
+    gHint: 'Comportamientos de poder y autoridad que quieres ver m\u00e1s',
+    rHint: 'Comportamientos de poder que quieres eliminar',
+    gEx: 'Ej: "Cuestionar una decisi\u00f3n con datos, sin importar el nivel jer\u00e1rquico"',
+    rEx: 'Ej: "Copiar al jefe en emails para presionar o cubrirse"'
+  },
+  {
+    id: 'conflicto', label: 'Conflicto y escalado',
+    intro: 'Define c\u00f3mo quieres que se resuelvan los desacuerdos. Qui\u00e9n habla con qui\u00e9n, cu\u00e1ndo se escala y qu\u00e9 nunca se permite.',
+    sits: [
+      {
+        s: 'Dos personas del mismo nivel tienen una discrepancia sobre c\u00f3mo ejecutar algo.',
+        q: '\u00bfC\u00f3mo quieres que lo resuelvan?',
+        o: [
+          'Hablan directamente entre ellos hasta llegar a una postura conjunta',
+          'Cada uno presenta su enfoque con evidencia y acuerdan un criterio para decidir',
+          'Buscan a alguien con m\u00e1s contexto del tema para que aporte perspectiva',
+          'Escalan al manager solo si tras hablar directamente no llegan a acuerdo'
+        ]
+      },
+      {
+        s: 'Alguien tiene un conflicto con su manager directo.',
+        q: '\u00bfC\u00f3mo quieres que lo gestione?',
+        o: [
+          'Va a la conversaci\u00f3n directa expresando su punto de vista con respeto y datos',
+          'Busca entender primero la perspectiva del manager antes de expresar la propia',
+          'Pide consejo a alguien de confianza para preparar bien la conversaci\u00f3n antes de ir',
+          'Intenta resolverlo directamente; escala a nivel superior solo si no funciona'
+        ]
+      }
+    ],
+    gHint: 'C\u00f3mo quieres que se nombre y resuelva el conflicto',
+    rHint: 'Qu\u00e9 formas de manejar el conflicto quieres eliminar',
+    gEx: 'Ej: "Nombrar la tensi\u00f3n directamente en el momento, sin esperar"',
+    rEx: 'Ej: "Hablar del conflicto con terceros antes de hablarlo con la persona involucrada"'
+  },
+  {
+    id: 'errores', label: 'Errores y accountability',
+    intro: 'Define c\u00f3mo quieres que se traten los errores. Esto determinar\u00e1 si tu IA aprende a nombrar los problemas o a enterrarlos.',
+    sits: [
+      {
+        s: 'Alguien detecta un error propio antes de que nadie lo note.',
+        q: '\u00bfC\u00f3mo quieres que act\u00fae?',
+        o: [
+          'Lo reporta de inmediato con el impacto estimado, antes de corregirlo',
+          'Lo corrige primero si puede, y luego informa con contexto de lo que hizo',
+          'Eval\u00faa el impacto y reporta si supera un umbral de relevancia',
+          'Lo corrige, lo documenta y lo comparte como aprendizaje con el equipo'
+        ]
+      },
+      {
+        s: 'El manager cometi\u00f3 un error que afect\u00f3 al equipo.',
+        q: '\u00bfC\u00f3mo quieres que se gestione?',
+        o: [
+          'El manager lo reconoce frente al equipo con claridad y explica qu\u00e9 har\u00e1 diferente',
+          'El manager lo habla en privado con los afectados directos',
+          'El equipo puede nombrarlo si el manager no lo hace, con respeto y datos',
+          'Se corrige el rumbo sin necesidad de nombrarlo expl\u00edcitamente \u2014 los hechos hablan'
+        ]
+      }
+    ],
+    gHint: 'C\u00f3mo quieres que se traten los errores y el aprendizaje',
+    rHint: 'Qu\u00e9 formas de manejar los errores quieres eliminar',
+    gEx: 'Ej: "Nombrar el error propio antes de que alguien lo descubra"',
+    rEx: 'Ej: "Buscar culpables antes de buscar soluciones"'
+  },
+  {
+    id: 'comunicacion', label: 'Comunicaci\u00f3n',
+    intro: 'Define c\u00f3mo quieres que fluya la informaci\u00f3n. La directitud, la honestidad bajo presi\u00f3n y c\u00f3mo se habla con quien tiene m\u00e1s rango.',
+    sits: [
+      {
+        s: 'Alguien tiene que comunicar que no va a poder cumplir un plazo.',
+        q: '\u00bfC\u00f3mo quieres que lo comunique?',
+        o: [
+          'Lo comunica en cuanto lo sabe, con nuevo plazo y qu\u00e9 necesita para cumplirlo',
+          'Lo comunica con antelaci\u00f3n aunque todav\u00eda no tenga el nuevo plazo claro',
+          'Propone qu\u00e9 puede entregar a tiempo aunque sea parcial, y qu\u00e9 queda pendiente',
+          'Busca una soluci\u00f3n primero y comunica junto con la alternativa'
+        ]
+      },
+      {
+        s: 'Alguien tiene que decirle a alguien de mayor rango que se equivoc\u00f3.',
+        q: '\u00bfC\u00f3mo quieres que lo haga?',
+        o: [
+          'Lo dice directamente, con datos, en privado',
+          'Lo plantea como una pregunta que invita a revisarlo juntos',
+          'Prepara la conversaci\u00f3n con evidencia y pide un espacio espec\u00edfico para tenerla',
+          'Lo pone por escrito para que haya constancia y la persona pueda procesarlo con calma'
+        ]
+      }
+    ],
+    gHint: 'C\u00f3mo quieres que fluya la comunicaci\u00f3n',
+    rHint: 'Qu\u00e9 patrones de comunicaci\u00f3n quieres eliminar',
+    gEx: 'Ej: "Aportar datos y contexto antes de dar una opini\u00f3n"',
+    rEx: 'Ej: "Escribir emails en MAY\u00dasCULAS para presionar o generar urgencia"'
+  },
+  {
+    id: 'priorizacion', label: 'Priorizaci\u00f3n',
+    intro: 'Define c\u00f3mo quieres que el equipo gestione la carga. C\u00f3mo se dice que no, c\u00f3mo se nombra el caos y c\u00f3mo se protege el trabajo importante.',
+    sits: [
+      {
+        s: 'Alguien recibe una tarea urgente cuando ya tiene la semana llena.',
+        q: '\u00bfC\u00f3mo quieres que responda?',
+        o: [
+          'Comunica su carga actual y negocia qu\u00e9 se mueve antes de aceptar lo nuevo',
+          'Acepta y propone qu\u00e9 existente se retrasa, para que quien pide decida',
+          'Negocia un plazo diferente o una entrega parcial como alternativa',
+          'Propone hacerlo en colaboraci\u00f3n para repartir la carga y cumplir los tiempos'
+        ]
+      },
+      {
+        s: 'Hay demasiadas prioridades declaradas y todo es urgente.',
+        q: '\u00bfC\u00f3mo quieres que se gestione?',
+        o: [
+          'Se nombra el problema y se convoca una conversaci\u00f3n para reducir las prioridades reales',
+          'Cada manager revisa con su equipo qu\u00e9 es realmente urgente y lo comunica hacia arriba',
+          'Se define un n\u00famero m\u00e1ximo de prioridades simult\u00e1neas y se hace cumplir',
+          'Se crea un proceso expl\u00edcito para declarar prioridades con criterios claros'
+        ]
+      }
+    ],
+    gHint: 'C\u00f3mo quieres que el equipo gestione su carga y diga que no',
+    rHint: 'Qu\u00e9 patrones de priorizaci\u00f3n quieres eliminar',
+    gEx: 'Ej: "Decir que no con contexto es tan v\u00e1lido como decir que s\u00ed"',
+    rEx: 'Ej: "Aceptar todo sin comunicar el impacto en lo existente"'
+  },
+  {
+    id: 'decisiones', label: 'Decisiones',
+    intro: 'Define el nivel de autonom\u00eda que quieres instalar. Qui\u00e9n puede decidir qu\u00e9, c\u00f3mo se act\u00faa con incertidumbre.',
+    sits: [
+      {
+        s: 'Alguien toma una decisi\u00f3n dentro de su rango de responsabilidad sin consultar al manager.',
+        q: '\u00bfC\u00f3mo quieres que lo maneje?',
+        o: [
+          'La toma con naturalidad y comunica la decisi\u00f3n y su criterio despu\u00e9s',
+          'La toma y solo comunica si el resultado tiene impacto visible para otros',
+          'Informa al manager antes de ejecutar, por transparencia, aunque no sea necesario',
+          'La toma, la documenta con el criterio usado y la deja disponible si alguien pregunta'
+        ]
+      },
+      {
+        s: 'Hay que tomar una decisi\u00f3n con informaci\u00f3n incompleta y tiempo limitado.',
+        q: '\u00bfC\u00f3mo quieres que act\u00fae el equipo?',
+        o: [
+          'Decide con lo disponible, documenta la incertidumbre y establece un punto de revisi\u00f3n',
+          'Identifica qu\u00e9 informaci\u00f3n m\u00ednima necesita y solo busca esa antes de decidir',
+          'Toma la opci\u00f3n m\u00e1s reversible posible para minimizar el coste del error',
+          'Decide y establece un punto de revisi\u00f3n expl\u00edcito para corregir si es necesario'
+        ]
+      }
+    ],
+    gHint: 'C\u00f3mo quieres que se tome y comunique una decisi\u00f3n',
+    rHint: 'Qu\u00e9 patrones de decisi\u00f3n quieres eliminar',
+    gEx: 'Ej: "Documentar el criterio usado para decidir, no solo el resultado"',
+    rEx: 'Ej: "Pedir aprobaci\u00f3n para decisiones que est\u00e1n dentro del propio rango"'
+  },
+  {
+    id: 'innovacion', label: 'Innovaci\u00f3n y riesgo',
+    intro: 'Define qu\u00e9 tan seguro quieres que sea proponer algo nuevo. C\u00f3mo se trata el fracaso y c\u00f3mo se protege la autor\u00eda.',
+    sits: [
+      {
+        s: 'Alguien quiere proponer una idea que va en contra de c\u00f3mo se ha hecho siempre.',
+        q: '\u00bfC\u00f3mo quieres que lo haga?',
+        o: [
+          'La propone con una hip\u00f3tesis testeable, sin necesitar pedir permiso primero',
+          'La documenta con evidencia antes de presentarla al equipo',
+          'La presenta en un espacio espec\u00edfico habilitado para cuestionar el statu quo',
+          'La eval\u00faan con los mismos criterios que cualquier otra, sin que el historial pese'
+        ]
+      },
+      {
+        s: 'Un experimento nuevo fall\u00f3 y el equipo invirti\u00f3 tiempo en \u00e9l.',
+        q: '\u00bfC\u00f3mo quieres que se trate ese fracaso?',
+        o: [
+          'Se hace un an\u00e1lisis de aprendizaje y se reconoce el valor de haber intentado',
+          'Se documenta qu\u00e9 condiciones habr\u00edan hecho que funcionara, para decisiones futuras',
+          'Se comparten los aprendizajes con otros equipos para que el fracaso multiplique',
+          'Se revisa el dise\u00f1o del experimento antes de concluir que la idea era mala'
+        ]
+      }
+    ],
+    gHint: 'C\u00f3mo quieres que se proponga y gestione la innovaci\u00f3n',
+    rHint: 'Qu\u00e9 patrones quieres eliminar en torno a las ideas y el riesgo',
+    gEx: 'Ej: "Proteger la autor\u00eda de las ideas \u2014 nombrar siempre de d\u00f3nde vienen"',
+    rEx: 'Ej: "Matar una idea nueva con \'ya lo intentamos\' sin escucharla"'
+  },
+  {
+    id: 'feedback', label: 'Feedback',
+    intro: 'Define si quieres que tu IA sea directa o diplom\u00e1tica. Esto depende de c\u00f3mo defines el feedback en tu organizaci\u00f3n, hacia arriba y hacia abajo.',
+    sits: [
+      {
+        s: 'Un manager quiere dar feedback sobre algo que alguien lleva tiempo haciendo mal.',
+        q: '\u00bfC\u00f3mo quieres que lo haga?',
+        o: [
+          'De forma directa, con ejemplo concreto y comportamiento alternativo',
+          'Con datos de impacto, no de intenci\u00f3n, para que no se vuelva personal',
+          'En la siguiente 1:1 con tiempo suficiente para que haya di\u00e1logo real',
+          'Abriendo con una pregunta sobre la perspectiva de la otra persona antes de dar el feedback'
+        ]
+      },
+      {
+        s: 'Alguien quiere darle feedback a su manager sobre algo que no est\u00e1 funcionando.',
+        q: '\u00bfC\u00f3mo quieres que lo haga?',
+        o: [
+          'Se lo dice directamente en privado con un ejemplo concreto',
+          'Lo enmarca como algo que afecta al equipo o al trabajo, no como cr\u00edtica personal',
+          'Pide un espacio espec\u00edfico para dar feedback antes de hacerlo',
+          'Lo escribe antes de la conversaci\u00f3n para tener claridad y no desviarse'
+        ]
+      }
+    ],
+    gHint: 'C\u00f3mo quieres que se d\u00e9 y reciba el feedback',
+    rHint: 'Qu\u00e9 formas de feedback quieres eliminar',
+    gEx: 'Ej: "Feedback sin ejemplo concreto no cuenta \u2014 siempre accionable"',
+    rEx: 'Ej: "Guardar el feedback para la evaluaci\u00f3n anual en lugar de darlo en el momento"'
+  },
+  {
+    id: 'reuniones', label: 'Reuniones',
+    intro: 'Define qu\u00e9 cultura de reuniones quieres. Qui\u00e9n deber\u00eda estar, c\u00f3mo terminan y qu\u00e9 nunca debe pasar.',
+    sits: [
+      {
+        s: 'La reuni\u00f3n termina sin que nadie sepa qu\u00e9 sigue.',
+        q: '\u00bfC\u00f3mo quieres que se cierre una reuni\u00f3n?',
+        o: [
+          'Alguien \u2014 asignado o voluntario \u2014 resume compromisos, responsables y fechas antes de cerrar',
+          'Se manda resumen escrito despu\u00e9s con responsables y fechas',
+          'Antes de cerrar, cada persona dice en voz alta qu\u00e9 se lleva como acci\u00f3n',
+          'Se acuerda un due\u00f1o del acuerdo y esa persona lo comunica y custodia'
+        ]
+      },
+      {
+        s: 'Se convoca una reuni\u00f3n que podr\u00eda haberse resuelto por mensaje.',
+        q: '\u00bfC\u00f3mo quieres que se gestione?',
+        o: [
+          'Alguien puede proponer cancelarla y resolverlo de forma as\u00edncrona',
+          'Se hace pero se acuerda que temas similares ser\u00e1n as\u00edncronos en adelante',
+          'Se asiste y al final se propone un protocolo m\u00e1s claro para convocar reuniones',
+          'Se asiste con una propuesta concreta preparada para acortar el tiempo al m\u00ednimo'
+        ]
+      }
+    ],
+    gHint: 'C\u00f3mo quieres que sean las reuniones',
+    rHint: 'Qu\u00e9 patrones de reuni\u00f3n quieres eliminar',
+    gEx: 'Ej: "Llegar con posici\u00f3n propia, no solo con preguntas"',
+    rEx: 'Ej: "Reuniones sin due\u00f1o de compromisos al cierre"'
+  },
+  {
+    id: 'bienestar', label: 'Bienestar y l\u00edmites',
+    intro: 'Define qu\u00e9 expectativas quieres que tenga la gente sobre el horario, la carga y c\u00f3mo se pide ayuda. Tu IA reforzar\u00e1 exactamente lo que definas aqu\u00ed.',
+    sits: [
+      {
+        s: 'Alguien est\u00e1 al l\u00edmite de su capacidad pero siente que no puede decirlo.',
+        q: '\u00bfC\u00f3mo quieres que se viva eso en tu organizaci\u00f3n?',
+        o: [
+          'Puede decirlo directamente sin que afecte su imagen ni su evaluaci\u00f3n',
+          'El manager pregunta proactivamente por la carga antes de que llegue al l\u00edmite',
+          'Hay rituales de equipo donde hablar de carga es normal, no excepcional',
+          'Se tienen se\u00f1ales compartidas para indicar saturaci\u00f3n sin necesitar verbalizarlo'
+        ]
+      },
+      {
+        s: 'Un manager trabaja constantemente fuera de horario y el equipo lo siente como expectativa.',
+        q: '\u00bfC\u00f3mo quieres que se gestione?',
+        o: [
+          'El manager lo nombra expl\u00edcitamente: es su elecci\u00f3n, no una expectativa para el equipo',
+          'El manager cambia su comportamiento visible si genera presi\u00f3n, aunque no sea su intenci\u00f3n',
+          'Se establece una norma de equipo sobre disponibilidad que aplica para todos, incluido el manager',
+          'El equipo puede nombrarlo directamente con el manager si lo percibe como presi\u00f3n impl\u00edcita'
+        ]
+      }
+    ],
+    gHint: 'C\u00f3mo quieres que se viva el bienestar y los l\u00edmites',
+    rHint: 'Qu\u00e9 patrones de bienestar quieres eliminar',
+    gEx: 'Ej: "Desconectar de verdad en vacaciones \u2014 sin mensajes ni disponibilidad"',
+    rEx: 'Ej: "Enviar mensajes fuera de horario esperando respuesta inmediata"'
+  }
+];
+
+var dimIdx = 0;
+var curMTab = 0;
+
+function setMod(n) {
+  document.querySelectorAll('.mod').forEach(function(m) { m.classList.remove('on'); });
+  document.getElementById('m' + n).classList.add('on');
+  var pcts = { 1:5, 2:38, 3:68, 4:86, 5:100 };
+  document.getElementById('pf').style.width = (pcts[n]||5) + '%';
+  window.scrollTo(0,0);
+}
+
+function setPills(c) {
+  ['cp2','cp3','cp4','cp5'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = c;
+  });
+}
+
+function go2() {
+  var c = document.getElementById('uC').value.trim();
+  var r = document.getElementById('uR').value;
+  var sz = document.getElementById('uS').value;
+  if (!c || !r || !sz) { alert('Por favor completa al menos la organizaci\u00f3n, tu rol y el tama\u00f1o del equipo.'); return; }
+  S.user = { name: document.getElementById('uN').value.trim(), company: c, role: r, size: sz, industry: document.getElementById('uI').value.trim() };
+  setPills(c);
+  dimIdx = 0;
+  renderDim();
+  setMod(2);
+}
+
+function renderDim() {
+  if (dimIdx >= DIMS.length) { setMod(3); return; }
+  var dim = DIMS[dimIdx];
+  var saved = S.answers[dim.id] || {};
+  var answered = Object.keys(saved).filter(function(k) { return saved[k]; }).length;
+
+  var chips = DIMS.map(function(d,i) {
+    var cls = i < dimIdx ? 'done' : i === dimIdx ? 'cur' : '';
+    return '<span class="dchip ' + cls + '">' + d.label + '</span>';
+  }).join('');
+
+  var html = '<div class="dchips">' + chips + '</div>';
+  html += '<div class="dhead">';
+  html += '<div class="eye">Dimensi\u00f3n ' + (dimIdx+1) + ' de ' + DIMS.length + ' \u2014 Cultura ideal</div>';
+  html += '<h2>' + dim.label + '</h2>';
+  html += '<p>' + dim.intro + '</p>';
+  html += '</div>';
+  html += '<div class="sctr"><b id="actr">' + answered + '</b> de ' + dim.sits.length + ' situaciones definidas</div>';
+
+  dim.sits.forEach(function(sit, i) {
+    var selVal = saved[i] || '';
+    var customVal = (S.custom[dim.id] && S.custom[dim.id][i]) || '';
+    html += '<div class="scard ' + (selVal ? 'ans' : '') + '" id="sc_' + dim.id + '_' + i + '">';
+    html += '<div class="shead"><div class="snum">' + (i+1) + '</div><div class="sscen">' + sit.s + '</div></div>';
+    html += '<div class="sbody">';
+    html += '<div class="squestion">' + sit.q + '</div>';
+    html += '<div class="bopts">';
+    sit.o.forEach(function(opt, oi) {
+      var isSel = selVal === opt;
+      html += '<button class="bopt ' + (isSel ? 'sel' : '') + '" onclick="selB(\'' + dim.id + '\',' + i + ',' + oi + ',this)">';
+      html += '<div class="brad"></div><div class="btxt">' + opt + '</div></button>';
+    });
+    html += '</div>';
+    html += '<div class="or-div">o describe c\u00f3mo quieres que se maneje en tu organizaci\u00f3n</div>';
+    html += '<textarea id="cu_' + dim.id + '_' + i + '" rows="2" placeholder="Descr\u00edbelo con una situaci\u00f3n concreta y un comportamiento observable..." onblur="valCu(\'' + dim.id + '\',' + i + ')">' + customVal + '</textarea>';
+    html += '<div class="vmsg" id="vm_' + dim.id + '_' + i + '"></div>';
+    html += '</div></div>';
+  });
+
+  var gVal = S.greenFlags[dim.id] || '';
+  var rVal = S.redFlags[dim.id] || '';
+  html += '<div class="flags-wrap">';
+  html += '<div class="flag-card gf">';
+  html += '<div class="flag-ttl">\uD83D\uDFE2 Green flags</div>';
+  html += '<p class="flag-hint">' + dim.gHint + '</p>';
+  html += '<p class="flag-ex">' + dim.gEx + '</p>';
+  html += '<textarea id="gf_' + dim.id + '" rows="3" placeholder="Comportamientos concretos y observables que quieres instalar..." onblur="valFlag(\'' + dim.id + '\',\'g\')">' + gVal + '</textarea>';
+  html += '<div class="flag-vld" id="gfv_' + dim.id + '"></div>';
+  html += '</div>';
+  html += '<div class="flag-card rf">';
+  html += '<div class="flag-ttl">\uD83D\uDEA9 Red flags</div>';
+  html += '<p class="flag-hint">' + dim.rHint + '</p>';
+  html += '<p class="flag-ex">' + dim.rEx + '</p>';
+  html += '<textarea id="rf_' + dim.id + '" rows="3" placeholder="Comportamientos concretos y observables que quieres eliminar..." onblur="valFlag(\'' + dim.id + '\',\'r\')">' + rVal + '</textarea>';
+  html += '<div class="flag-vld" id="rfv_' + dim.id + '"></div>';
+  html += '</div>';
+  html += '</div>';
+
+  html += '<div class="brow">';
+  html += '<button class="btn bp" onclick="nextDim()">' + (dimIdx < DIMS.length-1 ? 'Guardar y continuar \u2192' : 'Continuar al mindset \u2192') + '</button>';
+  if (dimIdx > 0) html += '<button class="btn bs" onclick="prevDim()">\u2190 Anterior</button>';
+  html += '</div>';
+
+  document.getElementById('m2c').innerHTML = html;
+}
+
+function selB(dimId, idx, oi, el) {
+  var dim = DIMS.find(function(d) { return d.id === dimId; });
+  var val = dim.sits[idx].o[oi];
+  if (!S.answers[dimId]) S.answers[dimId] = {};
+  S.answers[dimId][idx] = val;
+  if (!S.custom[dimId]) S.custom[dimId] = {};
+  S.custom[dimId][idx] = '';
+  var cu = document.getElementById('cu_' + dimId + '_' + idx);
+  if (cu) cu.value = '';
+  el.closest('.bopts').querySelectorAll('.bopt').forEach(function(b) { b.classList.remove('sel'); });
+  el.classList.add('sel');
+  var card = document.getElementById('sc_' + dimId + '_' + idx);
+  if (card) card.classList.add('ans');
+  updateCtr(dimId);
+}
+
+function updateCtr(dimId) {
+  var saved = S.answers[dimId] || {};
+  var ans = Object.keys(saved).filter(function(k) { return saved[k]; }).length;
+  var ctr = document.getElementById('actr');
+  if (ctr) ctr.textContent = ans;
+}
+
+async function valCu(dimId, idx) {
+  var el = document.getElementById('cu_' + dimId + '_' + idx);
+  if (!el || !el.value.trim()) return;
+  var txt = el.value.trim();
+  if (txt.split(' ').length < 5) {
+    showV(dimId, idx, 'err', 'Muy vago. Describe qu\u00e9 hace alguien concretamente en esa situaci\u00f3n.');
+    return;
+  }
+  try {
+    var res = await cc('Eval\u00faa si describe un comportamiento concreto y observable (no un valor abstracto ni una intenci\u00f3n): "' + txt + '". JSON sin backticks: {"isVague":true/false,"feedback":"una frase directa"}', 120);
+    var p = JSON.parse(res);
+    if (p.isVague) {
+      showV(dimId, idx, 'err', p.feedback);
+    } else {
+      if (!S.answers[dimId]) S.answers[dimId] = {};
+      S.answers[dimId][idx] = txt;
+      if (!S.custom[dimId]) S.custom[dimId] = {};
+      S.custom[dimId][idx] = txt;
+      var card = document.getElementById('sc_' + dimId + '_' + idx);
+      if (card) {
+        card.classList.add('ans');
+        card.querySelectorAll('.bopt').forEach(function(b) { b.classList.remove('sel'); });
+      }
+      updateCtr(dimId);
+      showV(dimId, idx, 'ok', '\u2713 Bien definido');
+      setTimeout(function() { hideV(dimId, idx); }, 2000);
+    }
+  } catch(e) {
+    if (!S.answers[dimId]) S.answers[dimId] = {};
+    S.answers[dimId][idx] = txt;
+    if (!S.custom[dimId]) S.custom[dimId] = {};
+    S.custom[dimId][idx] = txt;
+    updateCtr(dimId);
+  }
+}
+
+async function valFlag(dimId, type) {
+  var elId = (type === 'g' ? 'gf_' : 'rf_') + dimId;
+  var vldId = (type === 'g' ? 'gfv_' : 'rfv_') + dimId;
+  var el = document.getElementById(elId);
+  var vld = document.getElementById(vldId);
+  if (!el || !el.value.trim() || !vld) return;
+  var txt = el.value.trim();
+  var wordCount = txt.split(/\s+/).length;
+  if (wordCount < 3) return;
+  var isVague = /^(comportamientos?|actitudes?|valores?|mentalidad|cosas?)\s+(positivos?|negativos?|buenos?|malos?|autoritarios?|t\u00f3xicos?|sanos?)/i.test(txt);
+  if (!isVague && wordCount >= 4) {
+    try {
+      var res = await cc('Eval\u00faa si esto es lo suficientemente concreto para ser una instrucci\u00f3n de IA: "' + txt + '". Demasiado vago: valores abstractos, adjetivos sin comportamiento observable. Concreto: describe algo que alguien hace o dice. JSON sin backticks: {"isVague":true/false,"feedback":"una frase"}', 100);
+      var p = JSON.parse(res);
+      isVague = p.isVague;
+      if (isVague) {
+        vld.className = 'flag-vld on err';
+        vld.textContent = p.feedback;
+        return;
+      }
+    } catch(e) { return; }
+  } else if (isVague) {
+    vld.className = 'flag-vld on err';
+    vld.textContent = 'Demasiado gen\u00e9rico. Describe un comportamiento observable: qu\u00e9 dice o hace alguien concretamente.';
+    return;
+  }
+  vld.className = 'flag-vld on ok';
+  vld.textContent = '\u2713 Concreto y \u00fatil';
+  setTimeout(function() { vld.classList.remove('on'); }, 2000);
+}
+
+function showV(dimId, idx, type, txt) {
+  var el = document.getElementById('vm_' + dimId + '_' + idx);
+  if (!el) return;
+  el.className = 'vmsg on ' + type;
+  el.textContent = txt;
+}
+function hideV(dimId, idx) {
+  var el = document.getElementById('vm_' + dimId + '_' + idx);
+  if (el) el.classList.remove('on');
+}
+
+function saveCurDim() {
+  var dim = DIMS[dimIdx];
+  dim.sits.forEach(function(sit, i) {
+    var cu = document.getElementById('cu_' + dim.id + '_' + i);
+    if (cu && cu.value.trim() && !(S.answers[dim.id] && S.answers[dim.id][i])) {
+      if (!S.answers[dim.id]) S.answers[dim.id] = {};
+      S.answers[dim.id][i] = cu.value.trim();
+    }
+  });
+  var gEl = document.getElementById('gf_' + dim.id);
+  var rEl = document.getElementById('rf_' + dim.id);
+  if (gEl) S.greenFlags[dim.id] = gEl.value.trim();
+  if (rEl) S.redFlags[dim.id] = rEl.value.trim();
+}
+
+function nextDim() {
+  saveCurDim();
+  dimIdx++;
+  if (dimIdx >= DIMS.length) { setMod(3); return; }
+  renderDim();
+  window.scrollTo(0,0);
+}
+
+function prevDim() {
+  saveCurDim();
+  if (dimIdx > 0) { dimIdx--; renderDim(); window.scrollTo(0,0); }
+}
+
+function switchMTab(idx) {
+  curMTab = idx;
+  document.querySelectorAll('.mtab').forEach(function(t,i) { t.classList.toggle('on', i === idx); });
+  document.querySelectorAll('.mtab-panel').forEach(function(p,i) { p.classList.toggle('on', i === idx); });
+}
+
+function getMindsetData() {
+  if (curMTab === 0) {
+    var ex = document.getElementById('msExisting');
+    return ex ? ex.value.trim() : '';
+  } else {
+    var ideal = document.getElementById('msIdeal');
+    var extra = document.getElementById('msExtra');
+    var parts = [];
+    if (ideal && ideal.value.trim()) parts.push('EMPLEADO IDEAL: ' + ideal.value.trim());
+    if (extra && extra.value.trim()) parts.push('VALORES ADICIONALES: ' + extra.value.trim());
+    return parts.join('\n\n');
+  }
+}
+
+function go3() { setMod(3); }
+
+function go4() {
+  S.mindset = getMindsetData();
+  setMod(4);
+  genPrompt();
+}
+
+function go4skip() {
+  S.mindset = '';
+  setMod(4);
+  genPrompt();
+}
+
+async function genPrompt() {
+  document.getElementById('pld').classList.add('on');
+  document.getElementById('pc').style.display = 'none';
+
+  var company = S.user.company;
+  var culturalMap = '';
+
+  DIMS.forEach(function(dim) {
+    var saved = S.answers[dim.id] || {};
+    var gf = S.greenFlags[dim.id] || '';
+    var rf = S.redFlags[dim.id] || '';
+    var hasSits = Object.keys(saved).some(function(k) { return saved[k]; });
+    if (!hasSits && !gf && !rf) return;
+
+    culturalMap += '\n### ' + dim.label.toUpperCase() + '\n';
+    dim.sits.forEach(function(sit, i) {
+      if (saved[i]) {
+        culturalMap += 'SITUACI\u00d3N: ' + sit.s + '\n';
+        culturalMap += 'CULTURA IDEAL: ' + saved[i] + '\n\n';
+      }
+    });
+    if (gf) culturalMap += 'GREEN FLAGS (reforzar): ' + gf + '\n';
+    if (rf) culturalMap += 'RED FLAGS (nunca modelar): ' + rf + '\n';
+    culturalMap += '\n';
+  });
+
+  var mindsetSection = S.mindset ? '\nMINDSET Y VALORES:\n' + S.mindset + '\n' : '';
+
+  var prompt = 'Eres un experto en cultura organizacional y prompt engineering para IA corporativa. Metodolog\u00eda SER+HACER de Organizaciones Despiertas.\n\n' +
+    'Genera el system prompt de la IA de ' + company + (S.user.industry ? ' (' + S.user.industry + ')' : '') + '.\n\n' +
+    'ROL DE ESTE SYSTEM PROMPT: Ser un reforzador cultural. Cuando un empleado de ' + company + ' trae a la IA una situaci\u00f3n real de trabajo, la IA debe orientarle hacia la cultura ideal que la organizaci\u00f3n quiere construir \u2014 no describir lo que existe hoy.\n\n' +
+    'MAPA DE CULTURA IDEAL:\n' + culturalMap +
+    mindsetSection +
+    'ESTRUCTURA DEL SYSTEM PROMPT QUE DEBES GENERAR:\n\n' +
+    '1. IDENTIDAD CULTURAL (2-3 frases): Declaraci\u00f3n directa de qui\u00e9n es ' + company + ' y c\u00f3mo quiere trabajar. Sin jerga corporativa.\n\n' +
+    '2. INSTRUCCIONES SITUACIONALES: Una instrucci\u00f3n por cada DIMENSI\u00d3N (no por cada situaci\u00f3n). S\u00edntesis del comportamiento ideal de esa dimensi\u00f3n. Formato exacto:\n\n' +
+    'CUANDO alguien te traiga: "[tipo de situaci\u00f3n de esta dimensi\u00f3n]"\n' +
+    'HAZ: [comportamiento ideal concreto, en 1-2 frases]\n' +
+    'NO HAGAS: [trampa com\u00fan a evitar, en 1 frase]\n\n' +
+    '3. RED FLAGS \u2014 NUNCA MODELES: Una l\u00ednea por cada red flag definida. Formato: "Nunca orientes hacia [comportamiento]. Ofrece en cambio: [alternativa de ' + company + ']."\n\n' +
+    '4. PRINCIPIOS TRANSVERSALES (3-4 frases): Criterios de mindset que la IA aplica en cualquier situaci\u00f3n no definida expl\u00edcitamente.' +
+    (S.mindset ? ' Incorpora el mindset y valores definidos.' : '') + '\n\n' +
+    'REGLAS OBLIGATORIAS:\n' +
+    '\u2022 Escrito como instrucci\u00f3n t\u00e9cnica para una IA, no como texto para humanos\n' +
+    '\u2022 Usa el comportamiento exacto que defini\u00f3 la organizaci\u00f3n, sin parafrasear ni generalizar\n' +
+    '\u2022 Nada gen\u00e9rico: prohibido "promueve la colaboraci\u00f3n", "act\u00faa con empat\u00eda", "s\u00e9 profesional"\n' +
+    '\u2022 Cada instrucci\u00f3n debe ser tan concreta que quien la lea sepa exactamente qu\u00e9 hacer\n' +
+    '\u2022 En espa\u00f1ol\n' +
+    '\u2022 Respuesta breve y densa: mejor 10 instrucciones concretas que 20 gen\u00e9ricas\n\n' +
+    'Responde SOLO en JSON sin backticks:\n{"systemPrompt":"..."}';
+
+  try {
+    var res = await cc(prompt, 3000);
+    var data = JSON.parse(res);
+    if (!data.systemPrompt) throw new Error('Respuesta inesperada: ' + res.substring(0, 200));
+    var pt = data.systemPrompt;
+    S.prompt = pt;
+    document.getElementById('pt_claude').textContent = pt;
+    document.getElementById('pt_chatgpt').textContent = pt;
+    document.getElementById('pt_copilot').textContent = pt;
+  } catch(e) {
+    console.error('ERROR:', e);
+    document.getElementById('pt_claude').textContent = 'ERROR: ' + e.message;
+    document.getElementById('pt_chatgpt').textContent = 'ERROR: ' + e.message;
+    document.getElementById('pt_copilot').textContent = 'ERROR: ' + e.message;
+  }
+
+  document.getElementById('pld').classList.remove('on');
+  document.getElementById('pc').style.display = 'block';
+}
+
+function spt(platform, idx) {
+  document.querySelectorAll('.ptab').forEach(function(t,i) { t.classList.toggle('on', i === idx); });
+  ['claude','chatgpt','copilot'].forEach(function(p) {
+    document.getElementById('pp_' + p).classList.toggle('on', p === platform);
+  });
+}
+
+function cp(platform) {
+  var txt = document.getElementById('pt_' + platform).textContent;
+  navigator.clipboard.writeText(txt).then(function() {
+    var btn = document.getElementById('cb_' + platform);
+    var orig = btn.textContent;
+    btn.textContent = '\u2713 Copiado';
+    btn.classList.add('done');
+    setTimeout(function() { btn.textContent = orig; btn.classList.remove('done'); }, 2200);
+  });
+}
+
+async function go5() {
+  setMod(5);
+  document.getElementById('ild').classList.add('on');
+  var company = S.user.company;
+
+  var completedDims = DIMS.filter(function(d) {
+    var saved = S.answers[d.id] || {};
+    return Object.keys(saved).some(function(k) { return saved[k]; });
+  }).map(function(d) { return d.label; });
+
+  var rfSummary = '';
+  DIMS.forEach(function(d) {
+    if (S.redFlags[d.id]) rfSummary += d.label + ': ' + S.redFlags[d.id] + '\n';
+  });
+
+  var prompt = 'Eres Claudia Salas Bozich, consultora de cultura organizacional. Voz: directa, c\u00e1lida, sin eufemismos.\n\n' +
+    company + ' acab\u00f3 de definir su cultura ideal y generar su CulturePrint.\n' +
+    'Dimensiones trabajadas: ' + completedDims.join(', ') + '\n' +
+    'Red flags que quieren eliminar:\n' + (rfSummary || 'Ninguna registrada') + '\n' +
+    'Rol: ' + S.user.role + '\n\n' +
+    'Genera: (1) 2-3 dimensiones con mayor riesgo de amplificaci\u00f3n negativa si no se trabaja bien el prompt, (2) la conversaci\u00f3n que necesitan tener antes de desplegar la IA, (3) acci\u00f3n concreta para esta semana.\n\n' +
+    'JSON sin backticks: {"risks":[{"dimension":"nombre","risk":"1-2 frases directas","signal":"pregunta que revela si ya est\u00e1 pasando"}],"conversation":"2-3 frases directas","nextWeek":"acci\u00f3n concreta con qui\u00e9n, qu\u00e9 y cu\u00e1ndo"}';
+
+
+  try {
+    var res = await cc(prompt, 1000);
+    var data = JSON.parse(res);
+    renderInsights(data);
+  } catch(e) {
+    renderInsights({
+      risks: [{ dimension: 'Errores y accountability', risk: 'Si no se trabaja bien, la IA aprender\u00e1 a minimizar errores con elegancia. Lo har\u00e1 mejor que cualquier humano.', signal: '\u00bfCu\u00e1ndo fue la \u00faltima vez que alguien dijo "me equivoqu\u00e9" sin que nadie se lo pidiera?' }],
+      conversation: 'El equipo de liderazgo necesita leer el system prompt juntos y preguntarse: \u00bfesto describe la cultura que queremos construir o la que tenemos? Son preguntas muy distintas.',
+      nextWeek: 'Esta semana: comparte el prompt con una persona de liderazgo. P\u00eddele que identifique una cosa que falta y una que sobra. 30 minutos sin agenda previa.'
+    });
+  }
+
+  document.getElementById('ild').classList.remove('on');
+  document.getElementById('ic').style.display = 'block';
+}
+
+function renderInsights(data) {
+  var html = '';
+  html += '<div style="margin-bottom:18px"><div class="eye" style="margin-bottom:12px">Dimensiones con mayor riesgo de amplificaci\u00f3n</div>';
+  data.risks.forEach(function(r) {
+    html += '<div class="icard amp"><div class="ilbl">' + r.dimension + '</div><div class="itxt">' + r.risk + '</div><div class="isub">\u2192 ' + r.signal + '</div></div>';
+  });
+  html += '</div>';
+  html += '<div style="margin-bottom:18px"><div class="eye" style="margin-bottom:12px">La conversaci\u00f3n que necesitas tener primero</div>';
+  html += '<div class="icard conv"><div class="itxt">' + data.conversation + '</div></div>';
+  html += '</div>';
+  html += '<div style="margin-bottom:18px"><div class="eye" style="margin-bottom:12px">Por d\u00f3nde empiezas esta semana</div>';
+  html += '<div class="icard act"><div class="itxt">' + data.nextWeek + '</div></div>';
+  html += '</div>';
+  html += '<div class="quote">&ldquo;CulturePrint no es el final del proceso. Es la primera conversaci\u00f3n honesta que tu organizaci\u00f3n tiene con su IA. Y con ella misma.&rdquo;<br><br><small style="font-style:normal;font-size:.7rem;color:var(--ink-faint)">&mdash; Claudia Salas Bozich &middot; Organizaciones Despiertas</small></div>';
+  html += '<div class="foot"><p>CulturePrint &middot; Organizaciones Despiertas</p><p style="margin-top:5px"><a href="https://organizacionesdespiertas.com" target="_blank">organizacionesdespiertas.com</a></p></div>';
+  document.getElementById('ic').innerHTML = html;
+}
+
+async function cc(prompt, maxTok) {
+  var res = await fetch('/.netlify/functions/claude', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: prompt, max_tokens: maxTok || 2000 })
+  });
+  var data = await res.json();
+  if (data.error) throw new Error('API error: ' + JSON.stringify(data.error));
+  var txt = data.content.map(function(b) { return b.text || ''; }).join('');
+  return txt.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+}
+</script>
+</body>
+</html>
