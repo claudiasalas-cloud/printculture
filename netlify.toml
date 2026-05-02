@@ -5,17 +5,6 @@
 [functions]
   node_bundler = "esbuild"
 
-[[functions]]
-  path = "/api/claude"
-  
-[functions."claude"]
-  node_bundler = "esbuild"
-  
-[[redirects]]
-  from = "/"
-  to = "/index.html"
-  status = 200
-
 [[redirects]]
   from = "/*"
   to = "/index.html"
