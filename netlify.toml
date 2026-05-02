@@ -2,6 +2,15 @@
   functions = "netlify/functions"
   publish = "."
 
+[functions]
+  node_bundler = "esbuild"
+
+[[functions]]
+  path = "/api/claude"
+  
+[functions."claude"]
+  node_bundler = "esbuild"
+  
 [[redirects]]
   from = "/"
   to = "/index.html"
