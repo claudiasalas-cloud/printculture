@@ -1,4 +1,4 @@
-const https = require('https');
+const fetch = require('node-fetch');
 
 exports.handler = async function(event) {
   if (event.httpMethod !== 'POST') {
@@ -8,37 +8,23 @@ exports.handler = async function(event) {
   try {
     var body = JSON.parse(event.body);
     var prompt = body.prompt;
-    var maxTokens = body.max_tokens || 2000;
+    var maxTokens = body.max_tokens || 1500;
 
-    var payload = JSON.stringify({
-      model: 'claude-sonnet-4-6',
-      max_tokens: maxTokens,
-      messages: [{ role: 'user', content: prompt }]
+    var response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: maxTokens,
+        messages: [{ role: 'user', content: prompt }]
+      })
     });
 
-    var result = await new Promise(function(resolve, reject) {
-      var options = {
-        hostname: 'api.anthropic.com',
-        path: '/v1/messages',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': process.env.ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01',
-          'Content-Length': Buffer.byteLength(payload)
-        }
-      };
-
-      var req = https.request(options, function(res) {
-        var data = '';
-        res.on('data', function(chunk) { data += chunk; });
-        res.on('end', function() { resolve(JSON.parse(data)); });
-      });
-
-      req.on('error', reject);
-      req.write(payload);
-      req.end();
-    });
+    var data = await response.json();
 
     return {
       statusCode: 200,
@@ -46,7 +32,7 @@ exports.handler = async function(event) {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify(result)
+      body: JSON.stringify(data)
     };
 
   } catch (err) {
