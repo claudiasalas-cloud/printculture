@@ -200,8 +200,6 @@ textarea { resize: vertical; min-height: 78px; line-height: 1.65; }
 
 <div class="brand">
   <div class="bname">Culture<span>Print</span></div>
-  <div class="btag">your AI</div>
-  <div class="bod">Organizaciones Despiertas</div>
 </div>
 
 <!-- M1 BIENVENIDA -->
@@ -242,7 +240,7 @@ textarea { resize: vertical; min-height: 78px; line-height: 1.65; }
     <div class="fld" style="margin-bottom:0"><label>Industria (opcional)</label><input type="text" id="uI" placeholder="Ej. Farmac&eacute;utica, Tecnolog&iacute;a, Retail..."></div>
   </div>
   <div class="brow"><button class="btn bp" onclick="go2()">Definir la cultura ideal &rarr;</button></div>
-  <div class="foot"><p>Un producto de Organizaciones Despiertas &middot; Claudia Salas Bozich &middot; Metodolog&iacute;a SER+HACER</p></div>
+  <div class="foot"><p>Un producto de Organizaciones Despiertas &middot; Claudia Salas &middot; 2026</p></div>
 </div>
 
 <!-- M2 DIMENSIONES -->
@@ -284,6 +282,7 @@ textarea { resize: vertical; min-height: 78px; line-height: 1.65; }
   <div class="brow">
     <button class="btn bp" onclick="go4()">Generar mi CulturePrint &rarr;</button>
     <button class="btn bs" onclick="go4skip()">Saltar este paso &rarr;</button>
+    <button class="btn bs" onclick="setMod(2);renderDim()">&larr; Atr&aacute;s</button>
   </div>
 </div>
 
@@ -320,7 +319,10 @@ textarea { resize: vertical; min-height: 78px; line-height: 1.65; }
     <div class="prompt-note">
       <strong>Este prompt es un punto de partida, no el final.</strong> Revísalo, ajústalo, y añade lo que consideres. Si tu organización tiene valores formales con definiciones propias, pégalos al final del prompt con su descripción exacta &mdash; la IA los usará como criterio adicional.
     </div>
-    <div class="brow" style="margin-top:20px"><button class="btn bp" onclick="go5()">Ver insights y próximos pasos &rarr;</button></div>
+    <div class="brow" style="margin-top:20px">
+      <button class="btn bp" onclick="go5()">Ver insights y próximos pasos &rarr;</button>
+      <button class="btn bs" onclick="setMod(3)">&larr; Atrás</button>
+    </div>
   </div>
 </div>
 
@@ -740,6 +742,7 @@ function renderDim() {
   html += '<div class="brow">';
   html += '<button class="btn bp" onclick="nextDim()">' + (dimIdx < DIMS.length-1 ? 'Guardar y continuar \u2192' : 'Continuar al mindset \u2192') + '</button>';
   if (dimIdx > 0) html += '<button class="btn bs" onclick="prevDim()">\u2190 Anterior</button>';
+  if (dimIdx < DIMS.length-1) html += '<button class="btn bs" onclick="saveCurDim();setMod(3)" style="margin-left:auto;font-size:.75rem;opacity:.75">Generar con lo que tengo \u2192</button>';
   html += '</div>';
 
   document.getElementById('m2c').innerHTML = html;
