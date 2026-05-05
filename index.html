@@ -37,7 +37,7 @@ body { background: var(--cream); color: var(--ink); font-family: 'Poppins', sans
 .pbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: var(--warm-mid); z-index: 200; }
 .pfill { height: 100%; background: linear-gradient(90deg, var(--sage) 0%, var(--gold) 100%); transition: width .8s cubic-bezier(.4,0,.2,1); }
 
-.brand { position: fixed; top: 0; left: 0; right: 0; padding: 13px 40px; display: flex; align-items: center; justify-content: space-between; background: rgba(250,248,244,.96); backdrop-filter: blur(12px); z-index: 100; border-bottom: none; }
+.brand { position: fixed; top: 0; left: 0; right: 0; padding: 13px 40px; display: flex; align-items: center; justify-content: space-between; background: rgba(250,248,244,.96); backdrop-filter: blur(12px); z-index: 100; border-bottom: 1px solid var(--warm-mid); }
 .bname { font-size: 1.05rem; font-weight: 600; letter-spacing: -.02em; color: var(--ink); }
 .bname span { color: var(--sage); }
 .btag { font-size: .6rem; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
@@ -182,6 +182,14 @@ textarea { resize: vertical; min-height: 78px; line-height: 1.65; }
 .foot p { font-size: .68rem; color: var(--ink-faint); margin: 0; }
 .foot a { color: var(--sage); text-decoration: none; }
 
+@media print {
+  .pbar, .brand, .ptabs, .wpaste, .cbtn, .brow, .prompt-note, .eye, .ctop { display: none !important; }
+  .pbox { max-height: none; border: none; font-size: 11pt; line-height: 1.8; padding: 0; }
+  .ppanel { display: block !important; }
+  body { background: white; }
+  h2 { margin-bottom: 16px; }
+}
+
 @media (max-width:600px) {
   .mod { padding: 78px 16px 36px; }
   .brand { padding: 11px 16px; }
@@ -305,16 +313,19 @@ textarea { resize: vertical; min-height: 78px; line-height: 1.65; }
       <div class="wpaste"><strong>D&oacute;nde pegarlo</strong>Claude.ai &rarr; abre o crea un Proyecto &rarr; Configuraci&oacute;n &rarr; &ldquo;Project Instructions&rdquo;. Pega el texto completo.</div>
       <div class="pbox" id="pt_claude"></div>
       <button class="cbtn" id="cb_claude" onclick="cp('claude')">&#128203; Copiar</button>
+      <button class="cbtn" onclick="window.print()">&#128196; Descargar PDF</button>
     </div>
     <div class="ppanel" id="pp_chatgpt">
       <div class="wpaste"><strong>D&oacute;nde pegarlo</strong>ChatGPT &rarr; Configuraci&oacute;n &rarr; &ldquo;Custom Instructions&rdquo; &rarr; campo inferior. O en GPT Builder &rarr; &ldquo;Instructions&rdquo;.</div>
       <div class="pbox" id="pt_chatgpt"></div>
       <button class="cbtn" id="cb_chatgpt" onclick="cp('chatgpt')">&#128203; Copiar</button>
+      <button class="cbtn" onclick="window.print()">&#128196; Descargar PDF</button>
     </div>
     <div class="ppanel" id="pp_copilot">
       <div class="wpaste"><strong>D&oacute;nde pegarlo</strong>Copilot Studio &rarr; Tu agente &rarr; Configure &rarr; &ldquo;Instructions&rdquo;. En Microsoft 365: System Message de tu agente.</div>
       <div class="pbox" id="pt_copilot"></div>
       <button class="cbtn" id="cb_copilot" onclick="cp('copilot')">&#128203; Copiar</button>
+      <button class="cbtn" onclick="window.print()">&#128196; Descargar PDF</button>
     </div>
     <div class="prompt-note">
       <strong>Este prompt es un punto de partida, no el final.</strong> Revísalo, ajústalo, y añade lo que consideres. Si tu organización tiene valores formales con definiciones propias, pégalos al final del prompt con su descripción exacta &mdash; la IA los usará como criterio adicional.
@@ -1072,3 +1083,4 @@ async function cc(prompt, maxTok) {
 </script>
 </body>
 </html>
+
